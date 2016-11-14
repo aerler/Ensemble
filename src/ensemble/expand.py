@@ -6,6 +6,49 @@ Random utility functions...
 @author: Andre R. Erler, GPL v3
 '''
 
+# named exception
+class ArgumentError(Exception):
+  """Exception indicating an Error with the HGS Ensemble."""
+  pass
+
+## define function for recursion 
+# basically, loop over each list independently
+def _loop_recursion(*args, **kwargs):
+  ''' handle any number of loop variables recursively '''
+  # interpete arguments (kw-expansion is necessary)
+  if len(args) == 1:
+    # initialize dictionary of lists (only first recursion level)
+    loop_list = args[0][:] # use copy, since it will be decimated 
+    list_dict = {key:list() for key in kwargs.iterkeys()}
+  elif len(args) == 2:
+    loop_list = args[0][:] # use copy of list, to avoid interference with other branches
+    list_dict = args[1] # this is not a copy: all branches append to the same lists!
+  # handle loops
+  if len(loop_list) > 0:
+    # initiate a new recursion layer and a new loop
+    arg_name = loop_list.pop(0)
+    for arg in kwargs[arg_name]:
+      kwargs[arg_name] = arg # just overwrite
+      # new recursion branch
+      list_dict = _loop_recursion(loop_list, list_dict, **kwargs)
+  else:
+    # terminate recursion branch
+    for key,value in kwargs.iteritems():
+      list_dict[key].append(value)
+  # return results 
+  return list_dict
+
+# helper function to check lists
+def _prepareList(exp_list, kwargs):
+  ''' helper function to clean list elements '''
+  # get exp_list arguments
+  exp_list = [el for el in exp_list if el in kwargs] # remove missing entries
+  exp_dict = {el:kwargs[el] for el in exp_list}
+  for el in exp_list: del kwargs[el]
+  for el in exp_list: # check types 
+    if not isinstance(exp_dict[el], (list,tuple)): raise TypeError(el)
+  return exp_list, exp_dict
+
 
 # helper function to form inner and outer product of multiple lists
 def expandArgumentList(inner_list=None, outer_list=None, expand_list=None, lproduct='outer', **kwargs):
@@ -134,6 +177,7 @@ class BatchLoad(object):
         datasets.append(self.load_fct(**kwargs))    
       # construct ensemble
       if lensemble:
+        from ensemble.base import Ensemble 
         datasets = Ensemble(members=datasets, name=ens_name, title=ens_title, basetype='Dataset')
     # return list or ensemble of datasets
     return datasets
