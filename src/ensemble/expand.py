@@ -19,7 +19,7 @@ def _loop_recursion(*args, **kwargs):
   if len(args) == 1:
     # initialize dictionary of lists (only first recursion level)
     loop_list = args[0][:] # use copy, since it will be decimated 
-    list_dict = {key:list() for key in kwargs.iterkeys()}
+    list_dict = {key:list() for key in kwargs.keys()}
   elif len(args) == 2:
     loop_list = args[0][:] # use copy of list, to avoid interference with other branches
     list_dict = args[1] # this is not a copy: all branches append to the same lists!
@@ -33,7 +33,7 @@ def _loop_recursion(*args, **kwargs):
       list_dict = _loop_recursion(loop_list, list_dict, **kwargs)
   else:
     # terminate recursion branch
-    for key,value in kwargs.iteritems():
+    for key,value in kwargs.items():
       list_dict[key].append(value)
   # return results 
   return list_dict
@@ -72,7 +72,7 @@ def expandArgumentList(inner_list=None, outer_list=None, expand_list=None, lprod
       
     # handle outer product expansion first
     if len(outer_list) > 0:
-      kwtmp = {key:value for key,value in kwargs.iteritems() if key not in inner_list}
+      kwtmp = {key:value for key,value in kwargs.items() if key not in inner_list}
       
       # detect variables for parallel expansion
       # N.B.: parallel outer expansion is handled by replacing the arguments in each parallel expansion group
@@ -88,15 +88,15 @@ def expandArgumentList(inner_list=None, outer_list=None, expand_list=None, lprod
           # introduce fake argument and save record
           fake = 'TMP_'+'_'.join(kw)+'_{:d}'.format(len(kw)) # long name that is unlikely to interfere...
           par_dict[fake] = kw # store record of parallel expansion for reassembly later
-          kwtmp[fake] = zip(*par_args) # transpose lists to get a list of tuples                      
-        elif not isinstance(kw,basestring): raise TypeError(kw)
+          kwtmp[fake] = list(zip(*par_args)) # transpose lists to get a list of tuples                      
+        elif not isinstance(kw,str): raise TypeError(kw)
       # replace entries in outer list
       if len(par_dict)>0:
         outer_list = outer_list[:] # copy list
-        for fake,names in par_dict.iteritems():
+        for fake,names in par_dict.items():
           if names in outer_list:
             outer_list[outer_list.index(names)] = fake
-      assert all([ isinstance(arg,basestring) for arg in outer_list])
+      assert all([ isinstance(arg,str) for arg in outer_list])
       
       outer_list, outer_dict = _prepareList(outer_list, kwtmp)
       lstlen = 1
@@ -105,15 +105,15 @@ def expandArgumentList(inner_list=None, outer_list=None, expand_list=None, lprod
       # execute recursive function for outer product expansion    
       list_dict = _loop_recursion(outer_list, **outer_dict) # use copy of
       # N.B.: returns a dictionary where all kwargs have been expanded to lists of appropriate length
-      assert all(key in outer_dict for key in list_dict.iterkeys()) 
+      assert all(key in outer_dict for key in list_dict.keys()) 
       assert all(len(list_dict[el])==lstlen for el in outer_list) # check length    
-      assert all(len(ld)==lstlen for ld in list_dict.itervalues()) # check length  
+      assert all(len(ld)==lstlen for ld in list_dict.values()) # check length  
       
       # disassemble parallel expansion tuple and reassemble as individual arguments
       if len(par_dict)>0:
-        for fake,names in par_dict.iteritems():
+        for fake,names in par_dict.items():
           assert fake in list_dict
-          par_args = zip(*list_dict.pop(fake)) # transpose, to get an expanded tuple for each argument
+          par_args = list(zip(*list_dict.pop(fake))) # transpose, to get an expanded tuple for each argument
           assert len(par_args) == len(names) 
           for name,args in zip(names,par_args): list_dict[name] = args
          
@@ -136,9 +136,9 @@ def expandArgumentList(inner_list=None, outer_list=None, expand_list=None, lprod
       
     ## generate list of argument dicts
     arg_dicts = []
-    for n in xrange(lstlen):
+    for n in range(lstlen):
       # assemble arguments
-      lstargs = {key:lst[n] for key,lst in list_dict.iteritems()}
+      lstargs = {key:lst[n] for key,lst in list_dict.items()}
       arg_dict = kwargs.copy(); arg_dict.update(lstargs)
       arg_dicts.append(arg_dict)    
   # return list of arguments

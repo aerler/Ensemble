@@ -185,7 +185,7 @@ class MethodTest(unittest.TestCase):
     ens -= 'test'
     # fancy test of Variable and Dataset integration
     assert not any(ens[self.var.name].mean(axis='time').hasAxis('time'))
-    print(ens.prettyPrint(short=True))
+    print((ens.prettyPrint(short=True)))
     # apply function to dataset ensemble
     if all(ax.units == 'month' for ax in ens.time):
       maxens = ens.seasonalMax(lstrict=not lsimple); del maxens
@@ -193,7 +193,7 @@ class MethodTest(unittest.TestCase):
     tes = ens(time=slice(0,3,2))
     assert all(len(tax)==2 for tax in tes.time)
     # test list indexing
-    sne = ens[range(len(ens)-1,-1,-1)]
+    sne = ens[list(range(len(ens)-1,-1,-1))]
     assert sne[-1] == ens[0] and sne[0] == ens[-1]
 
 
@@ -202,7 +202,7 @@ if __name__ == "__main__":
 
     # use Intel MKL multithreading: OMP_NUM_THREADS=4
 #     import os
-    print('OMP_NUM_THREADS = {:s}\n'.format(os.environ['OMP_NUM_THREADS']))    
+    print(('OMP_NUM_THREADS = {:s}\n'.format(os.environ['OMP_NUM_THREADS'])))    
         
     specific_tests = []
 #     specific_tests += ['Ensemble']
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     # construct dictionary of test classes defined above
     test_classes = dict()
     local_values = locals().copy()
-    for key,val in local_values.iteritems():
+    for key,val in local_values.items():
       if key[-4:] == 'Test':
         test_classes[key[:-4]] = val
     
@@ -242,12 +242,12 @@ if __name__ == "__main__":
       errs += e
       f = len(test.failures)
       fails += f
-      if e+ f != 0: print("\nErrors in '{:s}' Tests: {:s}".format(name,str(test)))
+      if e+ f != 0: print(("\nErrors in '{:s}' Tests: {:s}".format(name,str(test))))
     if errs + fails == 0:
-      print("\n   ***   All {:d} Test(s) successfull!!!   ***   \n".format(runs))
+      print(("\n   ***   All {:d} Test(s) successfull!!!   ***   \n".format(runs)))
     else:
-      print("\n   ###     Test Summary:      ###   \n" + 
+      print(("\n   ###     Test Summary:      ###   \n" + 
             "   ###     Ran {:2d} Test(s)     ###   \n".format(runs) + 
             "   ###      {:2d} Failure(s)     ###   \n".format(fails)+ 
-            "   ###      {:2d} Error(s)       ###   \n".format(errs))
+            "   ###      {:2d} Error(s)       ###   \n".format(errs)))
     
