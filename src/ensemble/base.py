@@ -12,6 +12,7 @@ import multiprocessing
 import numpy as np
 # internal imports
 from ensemble.expand import expandArgumentList, ArgumentError 
+import collections
 
 # named exception
 class EnsembleError(Exception):
@@ -57,7 +58,7 @@ class EnsembleWrapper(object):
     if lparallel:
       # parallelize method execution using multiprocessing
       pool = multiprocessing.Pool(processes=NP) # initialize worker pool
-      if callback is not None and not callable(callback): raise TypeError(callback)
+      if callback is not None and not isinstance(callback, collections.Callable): raise TypeError(callback)
       # N.B.: the callback function is passed a result from the apply_method function, 
       #       which returns a tuple of the form (member, exit_code)
       # define work loads (function and its arguments) and start tasks      
@@ -110,31 +111,31 @@ class Ensemble(object):
     # no need to be too restrictive
     if 'basetype' in kwargs:
       self.basetype = kwargs.pop('basetype') # don't want to add that later! 
-      if isinstance(self.basetype,basestring):
+      if isinstance(self.basetype,str):
         self.basetype = globals()[self.basetype]
     elif isinstance(members[0],Dataset): self.basetype = Dataset
     elif isinstance(members[0],Variable): self.basetype = Variable
     else: self.basetype = members[0].__class__
     if len(members) > 0 and not all(isinstance(member,self.basetype) for member in members):
-      raise TypeError, "Not all members conform to selected type '{}'".format(self.basetype.__name__)
+      raise TypeError("Not all members conform to selected type '{}'".format(self.basetype.__name__))
     self.idkey = kwargs.get('idkey','name')
     # add keywords as attributes
-    for key,value in kwargs.iteritems():
+    for key,value in kwargs.items():
       self.__dict__[key] = value
     # add short-cuts and keys
     self.idkeys = []
     for member in self.members:
       memid = getattr(member, self.idkey)
       self.idkeys.append(memid)
-      if not isinstance(memid, basestring): raise TypeError, "Member ID key '{:s}' should be a string-type, but received '{:s}'.".format(str(memid),memid.__class__)
+      if not isinstance(memid, str): raise TypeError("Member ID key '{:s}' should be a string-type, but received '{:s}'.".format(str(memid),memid.__class__))
       if memid in self.__dict__:
-        raise AttributeError, "Cannot overwrite existing attribute '{:s}'.".format(memid)
+        raise AttributeError("Cannot overwrite existing attribute '{:s}'.".format(memid))
       self.__dict__[memid] = member
       
   def _recastList(self, fs):
     """Internal helper method to decide if a list or Ensemble should be returned."""
     if all(f is None for f in fs): return # suppress list of None's
-    elif all([not callable(f) and not isinstance(f, (Variable,Dataset)) for f in fs]): return fs  
+    elif all([not isinstance(f, collections.Callable) and not isinstance(f, (Variable,Dataset)) for f in fs]): return fs  
     elif all([isinstance(f, (Variable,Dataset)) for f in fs]):
       # N.B.: technically, Variable instances are callable, but that's not what we want here...
       if all([isinstance(f, Axis) for f in fs]): 
@@ -155,10 +156,10 @@ class Ensemble(object):
               if f.dataset_name is None: 
                 f.dataset_name = member.dataset_name
               elif not f.dataset_name == member.dataset_name: 
-                raise DatasetError, f.dataset_name
+                raise DatasetError(f.dataset_name)
             elif not hasattr(f, self.idkey): 
               setattr(f, self.idkey, getattr(member,self.idkey))
-            else: raise DatasetError, self.idkey
+            else: raise DatasetError(self.idkey)
 #             f.__dict__[self.idkey] = getattr(member,self.idkey)
           return Ensemble(*fs, idkey=self.idkey) # axes from several variables can be the same objects
       elif all([isinstance(f, Dataset) for f in fs]): 
@@ -172,7 +173,7 @@ class Ensemble(object):
             f.name = getattr(member,self.idkey)
           return Ensemble(*fs, idkey=self.idkey) # axes from several variables can be the same objects
       else:
-        raise TypeError, "Resulting Ensemble members have inconsisent type."
+        raise TypeError("Resulting Ensemble members have inconsisent type.")
   
   @property
   def size(self):
@@ -202,7 +203,7 @@ class Ensemble(object):
     # N.B.: this method is only called as a fallback, if no class/instance attribute exists,
     #       i.e. Variable methods and attributes will always have precedent 
     # determine attribute type
-    attrs = [callable(getattr(member, attr)) for member in self.members]
+    attrs = [isinstance(getattr(member, attr), collections.Callable) for member in self.members]
     if not any(attrs):
       # treat as regular attributes and return list of attibutes of all members
       return [getattr(member, attr) for member in self.members]
@@ -242,7 +243,7 @@ class Ensemble(object):
       else: 
         assert memid not in self.__dict__
         return False
-    elif isinstance(member, basestring):
+    elif isinstance(member, str):
       # assume it is the idkey
       if member in self.__dict__:
         assert self.__dict__[member] in self.members
@@ -251,12 +252,12 @@ class Ensemble(object):
       else: 
         assert member not in [getattr(m,self.idkey) for m in self.members]
         return False
-    else: raise TypeError, "Argument has to be of '{:s}' of 'basestring' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)       
+    else: raise TypeError("Argument has to be of '{:s}' of 'basestring' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__))       
       
   def addMember(self, member):
     """Add a new member to the ensemble."""
     if not isinstance(member, self.basetype): 
-      raise TypeError, "Ensemble members have to be of '{:s}' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)       
+      raise TypeError("Ensemble members have to be of '{:s}' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__))       
     self.members.append(member)
     self.__dict__[getattr(member,self.idkey)] = member
     return self.hasMember(member)
@@ -264,17 +265,17 @@ class Ensemble(object):
   def insertMember(self, i, member):
     """Insert a new member at location 'i'."""
     if not isinstance(member, self.basetype): 
-      raise TypeError, "Ensemble members have to be of '{:s}' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)       
+      raise TypeError("Ensemble members have to be of '{:s}' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__))       
     self.members.insert(i,member)
     self.__dict__[getattr(member,self.idkey)] = member
     return self.hasMember(member)
   
   def removeMember(self, member):
     """Remove a member from the ensemble."""
-    if not isinstance(member, (self.basetype,basestring)): 
-      raise TypeError, "Argument has to be of '{:s}' of 'basestring' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)
+    if not isinstance(member, (self.basetype,str)): 
+      raise TypeError("Argument has to be of '{:s}' of 'basestring' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__))
     if self.hasMember(member):
-      if isinstance(member, basestring): 
+      if isinstance(member, str): 
         memid = member
         member = self.__dict__[memid]
       else: memid = getattr(member,self.idkey)
@@ -321,7 +322,7 @@ class Ensemble(object):
     """Yet another way to access members by name... conforming to the container protocol. If argument is not a member,
     it is called with __getattr__.
     """
-    if isinstance(item, basestring): 
+    if isinstance(item, str): 
       if self.hasMember(item):
         # access members like dictionary
         return self.__dict__[item] # members were added as attributes
@@ -329,14 +330,14 @@ class Ensemble(object):
         try:
           # dispatch to member attributes 
           atts = [getattr(member,item) for member in self.members]
-          if any([callable(att) and not isinstance(att, (Variable,Dataset)) for att in atts]): raise AttributeError
+          if any([isinstance(att, collections.Callable) and not isinstance(att, (Variable,Dataset)) for att in atts]): raise AttributeError
           return self._recastList(atts)
           # N.B.: this is useful to load different Variables from Datasets by name, 
           #       without having to use getattr()
         except AttributeError:
-          if self.basetype is Dataset: raise DatasetError, item
-          elif self.basetype is Variable: raise VariableError, item
-          else: raise AttributeError, item
+          if self.basetype is Dataset: raise DatasetError(item)
+          elif self.basetype is Variable: raise VariableError(item)
+          else: raise AttributeError(item)
         #return self.__getattr__(item) # call like an attribute
     elif isinstance(item, (int,np.integer,slice)):
       # access members like list/tuple 
@@ -351,12 +352,12 @@ class Ensemble(object):
   def __setitem__(self, name, member):
     """Yet another way to add a member, this time by name... conforming to the container protocol."""
     idkey = getattr(member,self.idkey)
-    if idkey != name: raise KeyError, "The member ID '{:s}' is not consistent with the supplied key '{:s}'".format(idkey,name)
+    if idkey != name: raise KeyError("The member ID '{:s}' is not consistent with the supplied key '{:s}'".format(idkey,name))
     return self.addMember(member) # add member
     
   def __delitem__(self, member):
     """A way to delete members by name... conforming to the container protocol."""
-    if not isinstance(member, basestring): raise TypeError
+    if not isinstance(member, str): raise TypeError
     if not self.hasMember(member): raise KeyError
     return self.removeMember(member)
   
@@ -384,11 +385,11 @@ class Ensemble(object):
 
   def __isub__(self, member):
     """Remove a Dataset to an existing Ensemble."""
-    if isinstance(member, basestring) and self.hasMember(member):
+    if isinstance(member, str) and self.hasMember(member):
       assert self.removeMember(member), "A proble occurred removing Dataset '{:s}' from Ensemble.".format(member)    
     elif isinstance(member, self.basetype):
       assert self.removeMember(member), "A proble occurred removing Dataset '{:s}' from Ensemble.".format(member.name)
-    elif isinstance(member, (basestring,Variable)):
+    elif isinstance(member, (str,Variable)):
       assert all(self.removeVariable(member)), "A problem occurred removing Variable '{:s}' from Ensemble Members.".format(member.name)    
     return self # return self as result
 
