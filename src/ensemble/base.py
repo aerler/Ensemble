@@ -1,5 +1,5 @@
-"""
-Created on 2013-08-19
+"""Originally created on 2013-08-19. Extracted and written as a separate module on 2016-11-14, during PyCon Canada
+sprints.
 
 Variable and Dataset classes for handling geographical datasets.
 
@@ -11,36 +11,38 @@ import numpy as np
 
 # named exception
 class EnsembleError(Exception):
-  """ Exception indicating an Error with the HGS Ensemble """
+  """Exception indicating an Error with the HGS Ensemble."""
   pass
 
 # a function that executes a class/instance method for use in apply_async
 def apply_method(member, attr, **kwargs): 
-  """ execute the method 'attr' of instance 'member' with keyword arguments 'kwargs';
-      return a tuple containing member instance (possibly changed) and method results """
+  """Execute the method 'attr' of instance 'member' with keyword arguments 'kwargs';
+  return a tuple containing member instance (possibly changed) and method results.
+  """
   return member,getattr(member, attr)(**kwargs) # returns a TUPLE!!!
 
 
 ## define ensemble wrapper class
 class EnsembleWrapper(object):
-  """ 
-    A class that applies an attribute or method call on the ensemble class to all of its members
-    and returns a list of the results. The ensemble class is assumed to have an attribute 
-    'members', which is a list of the ensemble member.
-    The EnsembleWrapper class is instantiated with the ensemble class and the called attibure or
-    method in the __getattr__ method and is returned instead of the class attribute.
+  """A class that applies an attribute or method call on the ensemble class to all of its members and returns a list of
+  the results. The ensemble class is assumed to have an attribute 'members', which is a list of the ensemble member.
+
+  The EnsembleWrapper class is instantiated with the ensemble class and the called attibure or method in the __getattr__
+  method and is returned instead of the class attribute.
   """
 
   def __init__(self, klass, attr):
-    """ the object has to be initialized with the ensemlbe class 'klass' and the called attribute
-        'attr' in the __getattr__ method """
+    """The object has to be initialized with the ensemlbe class 'klass' and the called attribute 'attr' in the
+    __getattr__ method.
+    """
     self.klass = klass # the object that the attribute is called on
     self.attr = attr # the attribute name that is called
     
   def __call__(self, lparallel=False, NP=None, inner_list=None, outer_list=None, callback=None, **kwargs):
-    """ this method is called instead of a class or instance method; it applies the arguments 
-        'kwargs' to each ensemble member; it also supports argument expansion with inner and 
-        outer product (prior to application to ensemble) and parallelization using multiprocessing """
+    """This method is called instead of a class or instance method; it applies the arguments 'kwargs' to each ensemble
+    member; it also supports argument expansion with inner and outer product (prior to application to ensemble) and
+    parallelization using multiprocessing.
+    """
     # expand kwargs to ensemble list
     kwargs_list = expandArgumentList(inner_list=inner_list, outer_list=outer_list, **kwargs)
     if len(kwargs_list) == 1: kwargs_list = kwargs_list * len(self.klass.members)
@@ -76,10 +78,8 @@ class EnsembleWrapper(object):
   
 
 class Ensemble(object):
-  """
-    A container class that holds several datasets ("members" of the ensemble),
-    furthermore, the Ensemble class provides functionality to execute Dataset
-    class methods collectively for all members, and return the results in a tuple.
+  """A container class that holds several datasets ("members" of the ensemble), furthermore, the Ensemble class provides
+  functionality to execute Dataset class methods collectively for all members, and return the results in a tuple.
   """
   members   = None    # list of members of the ensemble
   basetype  = None # base class of the ensemble members
@@ -88,16 +88,15 @@ class Ensemble(object):
   ens_title = ''      # printable title used for the ensemble
   
   def __init__(self, *members, **kwargs):
-    """ Initialize an ensemble from a list of members (the list arguments);
-    keyword arguments are added as attributes (key = attribute name, 
-    value = attribute value).
+    """Initialize an ensemble from a list of members (the list arguments); keyword arguments are added as attributes
+    (key = attribute name, value = attribute value).
     
-  Attributes:
-    members      = list/tuple of members of the ensemble
-    basetype     = class of the ensemble members
-    idkey        = property of members used for unique identification
-    ens_name     = name of the ensemble (string)
-    ens_title    = printable title used for the ensemble (string)
+    Attributes:
+      members      = list/tuple of members of the ensemble
+      basetype     = class of the ensemble members
+      idkey        = property of members used for unique identification
+      ens_name     = name of the ensemble (string)
+      ens_title    = printable title used for the ensemble (string)
     """
     # add members
     self.members = list(members)
@@ -129,7 +128,7 @@ class Ensemble(object):
       self.__dict__[memid] = member
       
   def _recastList(self, fs):
-    """ internal helper method to decide if a list or Ensemble should be returned """
+    """Internal helper method to decide if a list or Ensemble should be returned."""
     if all(f is None for f in fs): return # suppress list of None's
     elif all([not callable(f) and not isinstance(f, (Variable,Dataset)) for f in fs]): return fs  
     elif all([isinstance(f, (Variable,Dataset)) for f in fs]):
@@ -184,15 +183,16 @@ class Ensemble(object):
     return self.members.__iter__()
   
   def __setattr__(self, attr, value):
-    """ redirect setting of attributes to ensemble members if the ensemble class does not have it """
+    """Redirect setting of attributes to ensemble members if the ensemble class does not have it."""
     if attr in self.__dict__ or attr in EnsHGS.__dict__: 
       super(EnsHGS, self).__setattr__(attr, value)
     else:
       for member in self.members: setattr(member, attr, value)
   
   def __getattr__(self, attr):
-    """ execute function call on ensemble members, using the same arguments; list expansion with 
-        inner_list/outer_list is also supported"""
+    """Execute function call on ensemble members, using the same arguments; list expansion with inner_list/outer_list is
+    also supported.
+    """
     # N.B.: this method returns an on-the-fly EnsembleWrapper instance which expands the argument       
     #       list and applies it over the list of methods from all ensemble members
     # N.B.: this method is only called as a fallback, if no class/instance attribute exists,
@@ -208,11 +208,11 @@ class Ensemble(object):
     else: raise EnsembleError("Inconsistent attribute type '{}'".format(attr))
      
   def __str__(self):
-    """ Built-in method; we just overwrite to call 'prettyPrint()'. """
+    """Built-in method; we just overwrite to call 'prettyPrint()'."""
     return self.prettyPrint(short=False) # print is a reserved word  
 
   def prettyPrint(self, short=False):
-    """ Print a string representation of the Ensemble. """
+    """Print a string representation of the Ensemble."""
     if short:      
       string = '{0:s} {1:s}'.format(self.__class__.__name__,self.ens_name)
       string += ', {:2d} Members ({:s})'.format(len(self.members),self.basetype.__name__)
@@ -227,7 +227,7 @@ class Ensemble(object):
     return string
 
   def hasMember(self, member):
-    """ check if member is part of the ensemble; also perform consistency checks """
+    """Check if member is part of the ensemble; also perform consistency checks."""
     if isinstance(member, self.basetype):
       # basetype instance
       memid = getattr(member,self.idkey)
@@ -250,7 +250,7 @@ class Ensemble(object):
     else: raise TypeError, "Argument has to be of '{:s}' of 'basestring' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)       
       
   def addMember(self, member):
-    """ add a new member to the ensemble """
+    """Add a new member to the ensemble."""
     if not isinstance(member, self.basetype): 
       raise TypeError, "Ensemble members have to be of '{:s}' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)       
     self.members.append(member)
@@ -258,7 +258,7 @@ class Ensemble(object):
     return self.hasMember(member)
   
   def insertMember(self, i, member):
-    """ insert a new member at location 'i' """
+    """Insert a new member at location 'i'."""
     if not isinstance(member, self.basetype): 
       raise TypeError, "Ensemble members have to be of '{:s}' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)       
     self.members.insert(i,member)
@@ -266,7 +266,7 @@ class Ensemble(object):
     return self.hasMember(member)
   
   def removeMember(self, member):
-    """ remove a member from the ensemble """
+    """Remove a member from the ensemble."""
     if not isinstance(member, (self.basetype,basestring)): 
       raise TypeError, "Argument has to be of '{:s}' of 'basestring' type; received '{:s}'.".format(self.basetype.__name__,member.__class__.__name__)
     if self.hasMember(member):
@@ -283,14 +283,14 @@ class Ensemble(object):
     return not self.hasMember(member)
   
   def __mul__(self, n):
-    """ how to combine with other objects """
+    """How to combine with other objects."""
     if isInt(n):
       return self.members*n
     else:
       raise TypeError
 
   def __add__(self, other):
-    """ how to combine with other objects """
+    """How to combine with other objects."""
     if isinstance(other, Ensemble):
       for member in other: self.addMember(member)
       return self
@@ -302,7 +302,7 @@ class Ensemble(object):
       raise TypeError
 
   def __radd__(self, other):
-    """ how to combine with other objects """
+    """How to combine with other objects."""
     if isinstance(other, Ensemble):
       for member in other: self.addMember(member)
       return self
@@ -314,8 +314,9 @@ class Ensemble(object):
       raise TypeError
 
   def __getitem__(self, item):
-    """ Yet another way to access members by name... conforming to the container protocol. 
-        If argument is not a member, it is called with __getattr__."""
+    """Yet another way to access members by name... conforming to the container protocol. If argument is not a member,
+    it is called with __getattr__.
+    """
     if isinstance(item, basestring): 
       if self.hasMember(item):
         # access members like dictionary
@@ -344,31 +345,31 @@ class Ensemble(object):
     else: raise TypeError
   
   def __setitem__(self, name, member):
-    """ Yet another way to add a member, this time by name... conforming to the container protocol. """
+    """Yet another way to add a member, this time by name... conforming to the container protocol."""
     idkey = getattr(member,self.idkey)
     if idkey != name: raise KeyError, "The member ID '{:s}' is not consistent with the supplied key '{:s}'".format(idkey,name)
     return self.addMember(member) # add member
     
   def __delitem__(self, member):
-    """ A way to delete members by name... conforming to the container protocol. """
+    """A way to delete members by name... conforming to the container protocol."""
     if not isinstance(member, basestring): raise TypeError
     if not self.hasMember(member): raise KeyError
     return self.removeMember(member)
   
   def __iter__(self):
-    """ Return an iterator over all members... conforming to the container protocol. """
+    """Return an iterator over all members... conforming to the container protocol."""
     return self.members.__iter__() # just the iterator from the member list
     
   def __contains__(self, member):
-    """ Check if the Ensemble instance has a particular member Dataset... conforming to the container protocol. """
+    """Check if the Ensemble instance has a particular member Dataset... conforming to the container protocol."""
     return self.hasMember(member)
 
   def __len__(self):
-    """ return number of ensemble members """
+    """Return number of ensemble members."""
     return len(self.members)
   
   def __iadd__(self, member):
-    """ Add a Dataset to an existing Ensemble. """
+    """Add a Dataset to an existing Ensemble."""
     if isinstance(member, self.basetype):
       assert self.addMember(member), "A problem occurred adding Dataset '{:s}' to Ensemble.".format(member.name)    
     elif isinstance(member, Variable):
@@ -378,7 +379,7 @@ class Ensemble(object):
     return self # return self as result
 
   def __isub__(self, member):
-    """ Remove a Dataset to an existing Ensemble. """      
+    """Remove a Dataset to an existing Ensemble."""
     if isinstance(member, basestring) and self.hasMember(member):
       assert self.removeMember(member), "A proble occurred removing Dataset '{:s}' from Ensemble.".format(member)    
     elif isinstance(member, self.basetype):
