@@ -1,0 +1,28 @@
+Bio:
+
+Andre R. Erler
+
+Andre is an early-career researcher in climate modeling and hydrology; that means he runs climate models and hydrological models on high performance computing facilities and analyses their output. He uses primarily uses the scientific software stack in Python for data analysis  and visualization, but also uses Python to manage experiments with large volumes of data (or "data plumbing").
+Andre is also interested in machine learning and the use of data science techniques in and outside of climate science, and he is somewhat concerned about the state of software development in science.
+Open source software, open science, the environment and sustainable global development are the causes he cares most about.
+
+
+
+Title: Managing Large Ensembles and Batch Execution with Python
+
+Level: Intermediate
+
+Brief:
+In many scientific applications it is necessary to run a large number of similar experiments (i.e. ensembles). Using examples from my own research, I will show how an Ensemble container class can be constructed in Python to simplify many of the tedious aspects of performing large sets of numerical experiments or simulations and to easily parallelize batch execution.
+
+Long:
+Due to increases in computational resources and more stringent requirements for reproducibility, it is now common in many fields of science and engineering to run large sets (or ensembles) of numerical experiments and statistical analyses. Common examples are sensitivity studies, Monte Carlo simulations, or bootstrapping samples.
+Python is an excellent scripting language to manage the construction and execution of such ensembles, and thanks to its well-developed scientific software stack, it is also well suited for subsequent analysis.
+In this presentation I will outline the challenges associated with large sets of experiments, using examples from my own research in hydrology and climate modeling. I will then introduce two general principles which, implemented in a new "Ensemble" container class, can significantly reduce the overhead associated with constructing and running large ensembles of numerical experiments.
+The first principle is to overload the __getattr__ method of the Ensemble container class so that class methods or attributes of the container elements can be called on the container instance and the call is automatically redirected to all elements inside the container. (This requires all elements to share the called method or attribute, but the container can be entirely agnostic of it.) Furthermore, it is easy to parallelize the method calls to container elements inside the Ensemble container. Otherwise the Ensemble container class would emulate the behavior of a list or (ordered) dictionary.
+The second principle is the expansion of (keyword) arguments based on inner and outer product rules. This facilitates the systematic construction of large argument lists and greatly reduces the need for repetitive boiler-plate code and error-prone manual data entry. The argument expansion can be implemented as a decorator for functions or methods, or can be integrated into the overloaded __getattr__ method of the Ensemble container class.
+
+Duration: 10 min.
+
+Notes:
+This talk will be most interesting for people who use Python for research purpose. I'm proposing this for a 10 min. talk, where I would only give a short introduction with an example, introduce the two main ideas, and give a very brief sketch of the implementation. I could also give a 30 min. talk with more examples from my research, including explicit use cases for the Ensemble container class, and much more detail on the implementation side.

@@ -1,0 +1,928 @@
+\documentclass[hyperref={pdfpagelabels=false},compress,final]{beamer}
+% \documentclass[hyperref={pdfpagelabels=false},compress,draft]{beamer}
+%\let\Tiny=\tiny % get rid of some useless warnings...
+\usepackage{lmodern} % also does the trick
+%\usepackage{default}
+\usepackage[english]{babel}
+% some standard options
+% \usepackage{verbatim}
+\usepackage{graphicx} %If you want to include postscript graphics
+\usepackage{graphics}
+\usepackage{color}
+\usepackage{epsfig}
+\usepackage{minted}
+\usepackage{url}
+\usepackage{float}
+%\usepackage{subfigure}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{lipsum}
+% \usepackage[latin1]{inputenc}
+% \usepackage{times}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,fit}
+%\usepackage{lineno}
+%\usepackage[bf,nooneline,format=plain,indention=.3cm]{caption}
+%\setlength{\captionmargin}{10pt}
+%\usepackage[letterpaper,hmargin=1in,vmargin=1.25in]{geometry}
+%\frenchspacing
+
+% some tweaking for bibliography
+\usepackage{natbib}
+\renewcommand{\bibsection}{\subsubsection*{\bibname }}
+\def\newblock{}
+
+% local definitions
+\newcommand{\foreign}[1]{{\it #1}}
+\renewcommand{\emph}[1]{{\it #1}}
+
+\newcommand{\myhw}{0.5\textwidth}
+\newcommand{\myfigw}{0.9\textwidth}
+\newcommand{\myw}{0.49\textwidth}
+\newcommand{\lc}{life--cycle~}
+
+% Equation references
+\renewcommand{\eqref}[1]{Eq.~(\ref{#1})}
+%\renewcommand{\vec}[1]{{\bf #1}}
+% Abbreviations
+\newcommand{\nn}{$N^2$}
+\newcommand{\nnm}{$N^2_{max}$}
+\newcommand{\zet}{$\zeta$}
+\newcommand{\zetp}{$\zeta_{TP}$}
+\newcommand{\dze}{$\Delta\zeta_{TP}$}
+\newcommand{\htp}{$h_{TP}$}
+\newcommand{\dttp}{$\Delta T_{TP}$}
+\newcommand{\p}{$p$}
+\renewcommand{\t}{$T$}
+\renewcommand{\theta}{$\theta$}
+% Directions
+\newcommand{\degN}{\ensuremath{^\circ}N}
+\newcommand{\degS}{\ensuremath{^\circ}S}
+\newcommand{\degE}{\ensuremath{^\circ}E}
+\newcommand{\degW}{\ensuremath{^\circ}W}
+\newcommand{\degC}{\ensuremath{^\circ}C}
+% other
+\renewcommand{\deg}{\ensuremath{^\circ}} % use for degree in math mode
+\newcommand{\st}{\ensuremath{^{st}}}
+\newcommand{\nd}{\ensuremath{^{nd}}}
+\newcommand{\rd}{\ensuremath{^{rd}}}
+\renewcommand{\th}{\ensuremath{^{th}}}
+\usepackage{verbatim} % the comment environment is in the verbatim package
+% \renewenvironment{comment}{\begin{itemize}}{\end{itemize}}
+\newcommand{\inlinecomment}[1]{{\noindent\sl#1}}
+% \newcommand{\app}[1]{Appendix~\ref{#1}}
+\newcommand{\app}[1]{Appendix~#1}
+% Units (math environment)
+\newcommand{\GB}{\ensuremath{\,\mbox{GB}}}
+\newcommand{\ms}{\ensuremath{\,\mbox{m\;s}^{-1}}}
+\newcommand{\mmday}{\ensuremath{\,\mbox{mm\;day}^{-1}}}
+\newcommand{\kgmmday}{\ensuremath{\,\mbox{kg\;m}^{-2}\,\mbox{day}^{-1}}}
+\newcommand{\kgmms}{\ensuremath{\,\mbox{kg\;m}^{-2}\,\mbox{s}^{-1}}}
+\newcommand{\kgms}{\ensuremath{\,\mbox{kg\;m}^{-1}\,\mbox{s}^{-1}}}
+\newcommand{\mss}{\ensuremath{\,\mbox{m\;s}^{-2}}}
+\newcommand{\pvu}{\ensuremath{\,\mbox{PVU}}}
+\newcommand{\kkm}{\ensuremath{\,\mbox{K\;km}^{-1}}}
+\newcommand{\m}{\ensuremath{\,\mbox{m}}}
+\newcommand{\s}{\ensuremath{\,\mbox{s}}}
+\newcommand{\Kkm}{\ensuremath{\,\mbox{K\;km}^{-1}}}
+\newcommand{\km}{\ensuremath{\,\mbox{km}}}
+\newcommand{\K}{\ensuremath{\,\mbox{K}}}
+\newcommand{\hPa}{\ensuremath{\,\mbox{hPa}}}
+\newcommand{\mssq}{\ensuremath{\,\mbox{m\;s}^2}}
+\newcommand{\JKmol}{\ensuremath{\,\mbox{J\;K}^{-1}\,\mbox{mol}^{-1}}}
+\newcommand{\kgmol}{\ensuremath{\,\mbox{kg\;mol}^{-1}}}
+\newcommand{\ssq}{\ensuremath{\times{}10^{-4}\,\mbox{s}^{-2}}}
+% math-environment abbreviations
+\newcommand{\ddz}[1]{\ensuremath{\frac{\partial #1}{\partial z}}}
+\newcommand{\ddp}[1]{\ensuremath{\frac{\partial #1}{\partial p}}}
+
+%
+% New Environments
+% standard bluish box
+\newenvironment{myBox}[3][shadow=true]%
+{\begin{center} \begin{minipage}{#2} \begin{beamerboxesrounded}[#1]{#3} \smallskip}%
+      {\smallskip \end{beamerboxesrounded} \end{minipage} \end{center}}
+% code box
+\newenvironment{myCode}[3][shadow=true]%
+{\begin{center} \begin{minipage}{#2} \begin{beamerboxesrounded}[#1]{#3}}%
+      {\end{beamerboxesrounded} \end{minipage} \end{center}}
+% N.B.: for some reason adding  \begin{minted}{python}/\end{minted} leads to errors...
+% greenish box
+\definecolor{lightgray}{rgb}{0.85,0.9,0.9}
+\definecolor{darkgreen}{rgb}{0.0,0.4,0.2}
+\setbeamercolor{upgreen}{fg=white,bg=darkgreen}
+\setbeamercolor{lowgreen}{fg=black,bg=lightgray}
+\newenvironment{myGreenBox}[3][upper=upgreen,lower=lowgreen,shadow=true]%
+{\begin{center} \begin{minipage}{#2} \begin{beamerboxesrounded}[#1]{#3} \smallskip}%
+      {\smallskip \end{beamerboxesrounded} \end{minipage} \end{center}}
+% redish box
+\definecolor{lightred}{rgb}{0.9,0.85,0.9}
+\definecolor{darkred}{rgb}{0.5,0.0,0.2}
+\setbeamercolor{upred}{fg=white,bg=darkred}
+\setbeamercolor{lowred}{fg=black,bg=lightred}
+\newenvironment{myRedBox}[3][upper=upred,lower=lowred,shadow=true]%
+{\begin{center} \begin{minipage}{#2} \begin{beamerboxesrounded}[#1]{#3} \smallskip}%
+      {\smallskip \end{beamerboxesrounded} \end{minipage} \end{center}}
+%
+% Hyphenation
+\hyphenation{tro-po-pau-se}
+\hyphenation{tro-po-pau-ses}
+\hyphenation{pa-ra-me-ter-i-za-ti-ons}
+\hyphenation{ra-di-o-son-de}
+\hyphenation{me-ri-di-o-nal}
+\hyphenation{a-na-ly-sis}
+\hyphenation{ba-ro-cli-nic}
+\hyphenation{geo-stro-phic}
+
+%\DeclareMathOperator{\ln}{ln}
+% increase line spacing by a factor of 1.5
+%\renewcommand{\baselinestretch}{1.5}
+
+\mode<presentation>{
+\usetheme{Malmoe} % Malmoe Frankfurt
+\usecolortheme{whale}
+\usecolortheme{orchid}
+\setbeamertemplate{bibliography item}[text]
+\setbeamercovered{transparent}
+}
+
+\DeclareGraphicsExtensions{.png,.pdf,.jpg} %.pdf,.png,.jpg
+\graphicspath{{figures/fullsize/}}
+% \graphicspath{{figures/small/}}
+
+\title[Large Ensembles and Batch Execution with Python]{A Class to Manage Large Ensembles and \\ Batch Execution in Python}
+\subtitle{\bigskip PyCon Canada}
+\author[\href{http://www.physics.utoronto.ca/~aerler/}{Andre R. Erler} (\href{mailto:A.R.Erler@gmail.com}{A.R.Erler@gmail.com})]{Andre R. Erler}
+\institute{\includegraphics[width=0.35\textwidth]{aquanty-Logo_transparent}\\ \bigskip}
+\date{November $12^{th}$, 2016}
+%\logo{\includegraphics[scale=0.15]{HD3}}
+
+% \AtBeginSection[]
+% {
+%    \begin{frame}{Outline}
+%        \tableofcontents[currentsection]
+%    \end{frame}
+% }
+
+% *************************************************************************************************
+\providecommand\thispdfpagelabel[1]{}
+
+\begin{document}
+
+% \section*{\ }
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+\tableofcontents%[pausesections]
+\end{frame}
+
+
+% ################################################################################################
+
+
+\section{Introduction}
+% \begin{frame}{Outline}
+% \tableofcontents[currentsection]
+% \end{frame}
+
+
+\subsection[Repetitive Science]{Science is Repetitive}
+
+\begin{frame}{Science is Repetitive}
+ \begin{columns}
+   \begin{column}{0.6\textwidth}
+     \small \medskip\\
+     To reach conclusive results, scientific experiments usually have to be repeated many times; either to establish statistical significance, or to test a range of parameter values for optimization.\\
+     \bigskip
+     \hspace*{-1cm}
+     \includegraphics[width=1.2\textwidth]{GC_SampleTray}
+   \end{column}
+   \begin{column}{0.4\textwidth}
+     \vspace*{-1.cm}\\%\hspace*{-0.5cm}
+     \includegraphics[width=1.2\textwidth]{geo_samples}\\
+    \bigskip
+     \small Experiments are planned and conducted in large batches or so-called \textit{ensembles}.\\ \smallskip
+     \onslide<2->{\begin{myGreenBox}[shadow=true]{0.85\textwidth}{Automation}
+       \small It is therefore desirable to automate the most repetitive tasks, and to create tools for this purpose.
+     \end{myGreenBox}}
+  \end{column}
+ \end{columns}
+\end{frame}
+
+
+\subsection{What I do}
+
+\begin{frame}{\hspace{0.55\textwidth} Coupling Climate Models\\ \hspace*{0.55\textwidth} with Hydrologic Models}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \vspace*{-1.5cm}
+      \includegraphics[width=\textwidth]{Ts_annual_ortho_ndl}\\
+      {\scriptsize Surface Temperature in a Global and a nested Regional Climate Model}
+      \begin{myBox}{0.95\textwidth}{}
+        \footnotesize I run Climate and Hydrologic Models to study the impact of climate change on water resources and generate projections of future hydro-climate.
+      \end{myBox}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \vspace*{.25cm}\\
+      \scriptsize Athabasca River watershed: \\ groundwater depth (top) and surface water depth (bottom)
+      \includegraphics[width=\textwidth]{ARB.png}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{High Performance Computing}
+  \begin{columns}[T]
+ \begin{column}{0.5\textwidth}
+  \begin{itemize}
+  \item High-resolution Climate simulations:\\ \smallskip
+    \begin{itemize}
+     \item 4 days on 128 cores and 300GB of storage per model year
+     \item 36 ensemble members, 15 years each
+     % about 750 core years
+    \end{itemize}
+  \medskip %\pause
+  \item Surface-Subsurface Hydrologic Simulations:\\ \smallskip
+    \begin{itemize}
+     \item 1 day on 2 cores per model year
+     \item also 15 years each, 100+ ensemble members
+    \end{itemize}
+  \end{itemize}
+  %\medskip
+  %\begin{myBox}{0.8\textwidth}{}
+    %\footnotesize Run on SciNet HPC Facility %All simulations were performed on the SciNet super-computing facility, requiring more than $10^6$ core hours and 40\,TB storage.
+  %\end{myBox}
+ \end{column}
+ \begin{column}{0.5\textwidth}
+   \vspace*{-.8cm}
+  \includegraphics[width=1.1\textwidth]{TCS-1}
+ \end{column}
+\end{columns}
+\end{frame}
+
+
+\subsection*{Motivation}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.5cm} Motivation: \\ \hspace*{0.5cm} Batch Processing}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item<1-> In Computational Sciences repetitive tasks can be automated/scripted \smallskip
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \vspace*{-1.5cm}
+        \onslide<2->{\begin{myRedBox}{0.9\textwidth}{\textbf{Boilerplate Code}}
+          Python simplifies scripting a lot, but we still have a lot of boilerplate code!
+          This can be simplified further.
+        \end{myRedBox}}
+    \end{column}
+  \end{columns}
+        \small
+      \begin{myCode}{\textwidth}{\textbf{Python is an Ideal Scripting Language}}
+        \begin{minted}{python}
+ensemble = [...] # a list of objects ``members''
+
+# for loop iterating over list
+tmp = [] # store results
+for member in ensemble: # iterate over list
+    tmp.append( result = member.operation(*args, **kwargs) )
+ensemble = tmp
+
+# list comprehension is already much shorter!
+ensemble = [m.operation(*args, **kwargs) for m in ensemble]
+        \end{minted}
+      \end{myCode}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.5cm} Motivation: \\ \hspace*{0.5cm} Batch Processing}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item<1-> In Computational Sciences repetitive tasks can be automated/scripted \smallskip
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \vspace*{-1.5cm}
+        \onslide<1->{\begin{myRedBox}{0.9\textwidth}{\textbf{Boilerplate Code}}
+          Python simplifies scripting a lot, but we still have a lot of boilerplate code!
+          This can be simplified further.
+        \end{myRedBox}}
+    \end{column}
+  \end{columns}
+  \small
+  \begin{myCode}{\textwidth}{\textbf{Python is an Ideal Scripting Language}}
+    \begin{minted}{python}
+ensemble = [...] # a list of objects ``members''
+
+# for loop iterating over list
+tmp = [] # store results
+for member in ensemble: # iterate over list
+    tmp.append( result = member.operation(*args, **kwargs) )
+ensemble = tmp
+
+# list comprehension is already much shorter!
+ensemble = [m.operation(*args, **kwargs) for m in ensemble]
+    \end{minted}
+  \end{myCode}
+\end{frame}
+
+
+% ################################################################################################
+
+
+\section[\ Ensemble Class]{Batch Execution using an Ensemble Class}
+
+
+\subsection*{Motivation}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.5cm} Motivation: \\ \hspace*{0.5cm} Batch Processing}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item<1-> In Computational Sciences repetitive tasks can be automated/scripted \smallskip
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \vspace*{-1.5cm}
+        \onslide<2->{\begin{myGreenBox}{0.9\textwidth}{\textbf{The Ensemble Class}}
+          %A container class on which member methods can be called can
+          %reduce boilerplate code and add more functionality
+          \smallskip
+          \begin{itemize}
+            \item Emulate Container Type \smallskip
+            \item Redirect method calls to ensemble members
+          \end{itemize}
+        \end{myGreenBox}}
+    \end{column}
+  \end{columns}
+        \small
+      \begin{myCode}{\textwidth}{\textbf{And Ideal Use-case Example}}
+        \begin{minted}{python}
+ensemble = Ensemble(*[...]) # create Ensemble object
+
+# apply member methods to entire ensemble
+ensemble = ensemble.operation_1(*args, **kwargs)
+...
+ensemble = ensemble.operation_N(*args, **kwargs)
+
+member_N = ensemble[n] # access elements by index
+member_key = ensemble[key] # .. or by name/key
+...
+        \end{minted}
+      \end{myCode}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.5cm} Motivation: \\ \hspace*{0.5cm} Batch Processing}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item<1-> In Computational Sciences repetitive tasks can be automated/scripted \smallskip
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \vspace*{-1.5cm}
+      \onslide<1->{\begin{myGreenBox}{0.9\textwidth}{\textbf{The Ensemble Class}}
+          %A container class on which member methods can be called can
+          %reduce boilerplate code and add more functionality
+          \smallskip
+          \begin{itemize}
+            \item Emulate Container Type \smallskip
+            \item Redirect method calls to ensemble members
+          \end{itemize}
+        \end{myGreenBox}}
+    \end{column}
+  \end{columns}
+  \small
+  \begin{myCode}{\textwidth}{\textbf{And Ideal Use-case Example}}
+    \begin{minted}{python}
+ensemble = Ensemble(*[...]) # create Ensemble object
+
+# apply member methods to entire ensemble
+ensemble = ensemble.operation_1(*args, **kwargs)
+...
+ensemble = ensemble.operation_N(*args, **kwargs)
+
+member_N = ensemble[n] # access elements by index
+member_key = ensemble[key] # .. or by name/key
+...
+    \end{minted}
+  \end{myCode}
+\end{frame}
+
+
+\subsection[\ Ensemble Class]{The Ensemble Class}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.65\textwidth}The Ensemble Class}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.cm}
+      \begin{myBox}{1.\textwidth}{Implementation Snippet}
+        \small
+        \begin{minted}{python}
+class Ensemble(object):
+  _members = None # members
+  ...
+
+  def __getitem__(self, i):
+    # get individual members
+    if isinstance(i, int):
+      # access like list/tuple
+      return self._members[i]
+    elif isinstance(i, string):
+      ...
+
+  def __iter__(self):
+    # iterate over members
+    mm = self._members
+    return mm.__iter__()
+  ...
+
+        \end{minted}
+      \end{myBox}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \medskip \\
+      { \large Emulating the Python \\ \smallskip \textbf{\color{darkred} Container Type}:} \\
+      \small
+      \begin{enumerate}
+        \item Support several built-in methods, such as \texttt{\_\_len\_\_}, \texttt{\_\_contains\_\_}, \texttt{\_\_iter\_\_} \medskip
+        \item Item assignment like \texttt{list} or \texttt{dict} using \texttt{\_\_getitem\_\_} and \texttt{\_\_setitem\_\_}\medskip
+        %\item Methods like \texttt{\_\_add\_\_} or \texttt{\_\_iadd\_\_} can also be implemented
+      \end{enumerate}
+      \onslide<2->{\begin{myBox}{0.85\textwidth}{Return Values}
+        Calls to member methods return a new container or Ensemble with the results
+      \end{myBox}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.65\textwidth}The Ensemble Class}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.cm}
+      \begin{myBox}{1.\textwidth}{Implementation Snippet}
+        \small
+        \begin{minted}{python}
+class Ensemble(object):
+  _members = None # members
+  ...
+
+  def __getitem__(self, i):
+    # get individual members
+    if isinstance(i, int):
+      # access like list/tuple
+      return self._members[i]
+    elif isinstance(i, string):
+      ...
+
+  def __iter__(self):
+    # iterate over members
+    mm = self._members
+    return mm.__iter__()
+  ...
+        \end{minted}
+      \end{myBox}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \medskip \\
+      { \large Emulating the Python \\ \smallskip \textbf{\color{darkred} Container Type}:} \\
+      \small
+      \begin{enumerate}
+        \item Support several built-in methods, such as \texttt{\_\_len\_\_}, \texttt{\_\_contains\_\_}, \texttt{\_\_iter\_\_} \medskip
+        \item Item assignment like \texttt{list} or \texttt{dict} using \texttt{\_\_getitem\_\_} and \texttt{\_\_setitem\_\_}\medskip
+        %\item Methods like \texttt{\_\_add\_\_} or \texttt{\_\_iadd\_\_} can also be implemented
+      \end{enumerate}
+      \onslide<1->{\begin{myBox}{0.85\textwidth}{Return Values}
+          Calls to member methods return a new container or Ensemble with the results
+        \end{myBox}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+
+\begin{frame}[fragile=singleslide]{The Ensemble Class}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \medskip \\
+      { \large Implementation of \\ \smallskip \textbf{\color{darkred} Method Redirection}:} \\
+      \small
+      \begin{enumerate}
+        \item Redirect calls to member methods/attributes by overloading \texttt{\_\_getattr\_\_} \medskip
+        \item Execute call on all Ensemble members \medskip
+        \item Return a new container or Ensemble with results
+      \end{enumerate}
+      \onslide<2->{\begin{myRedBox}{.9\textwidth}{Ensemble Wrapper}
+        Methods require helper Class \texttt{EnsWrap} to apply arguments
+      \end{myRedBox}}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.cm}
+      \begin{myBox}{1.\textwidth}{Implementation Snippet}
+        \small
+        \begin{minted}{python}
+class Ensemble(object):
+  _members = None # members
+  ...
+
+  def __getattr__(self, attr):
+    # check if callable
+    mem0 = self._members[0]
+    # assuming homogeneity...
+    f = getattr(mem0,attr)
+    if callable(f):
+      # return Ensemble Wrapper
+      v = EnsWrap(self,attr)
+    else:
+      # just return values
+      v = [getattr(m,attr) \
+         for m in self._members]
+    return v
+        \end{minted}
+      \end{myBox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{The Ensemble Class}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \medskip \\
+      { \large Implementation of \\ \smallskip \textbf{\color{darkred} Method Redirection}:} \\
+      \small
+      \begin{enumerate}
+        \item Redirect calls to member methods/attributes by overloading \texttt{\_\_getattr\_\_} \medskip
+        \item Execute call on all Ensemble members \medskip
+        \item Return a new container or Ensemble with results
+      \end{enumerate}
+      \onslide<1->{\begin{myRedBox}{.9\textwidth}{Ensemble Wrapper}
+        Methods require helper Class \texttt{EnsWrap} to apply arguments
+      \end{myRedBox}}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.cm}
+      \begin{myBox}{1.\textwidth}{Implementation Snippet}
+        \small
+        \begin{minted}{python}
+class Ensemble(object):
+  _members = None # members
+  ...
+
+  def __getattr__(self, attr):
+    # check if callable
+    mem0 = self._members[0]
+    # assuming homogeneity...
+    f = getattr(mem0,attr)
+    if callable(f):
+      # return Ensemble Wrapper
+      v = EnsWrap(self,attr)
+    else:
+      # just return values
+      v = [getattr(m,attr) \
+         for m in self._members]
+    return v
+        \end{minted}
+      \end{myBox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\subsection[Ensemble Wrapper]{A Helper Class}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.65\textwidth}A Helper Class}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.cm}
+      \begin{myBox}{1.\textwidth}{Implementation Snippet}
+        \small
+        \begin{minted}{python}
+class EnsWrap(object):
+  ...
+
+  def __init__(self, ens, attr):
+    _ensemble = ens # members
+    _attr = attr # member method
+
+  def __call__(self, **kwargs):
+    # iterate over members
+    new = Ensemble()
+    for m in self._ensemble:
+      f = getattr(m,self.attr)
+      # execute member method
+      new.append(f(**kwargs))
+    # return new ensemble
+    return new
+  ...
+        \end{minted}
+      \end{myBox}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \medskip \\
+      { \large Implementation of the \\ \smallskip \textbf{\color{darkred} Ensemble Wrapper}:} \\
+      \small
+      \begin{enumerate}
+        \item Initialize with ensemble members and the called attribute/method \medskip
+        \item Use \texttt{\_\_call\_\_} method to execute member method with arguments
+      \end{enumerate}
+      \onslide<2->{\begin{myGreenBox}{0.9\textwidth}{Parallelization}
+        Simple parallelization using \texttt{multiprocessing.Pool}'s \texttt{apply\_async} can be applied
+      \end{myGreenBox}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.65\textwidth}A Helper Class}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.cm}
+      \begin{myBox}{1.\textwidth}{Implementation Snippet}
+        \small
+        \begin{minted}{python}
+class EnsWrap(object):
+  ...
+
+  def __init__(self, ens, attr):
+    _ensemble = ens # members
+    _attr = attr # member method
+
+  def __call__(self, **kwargs):
+    # iterate over members
+    new = Ensemble()
+    for m in self._ensemble:
+      f = getattr(m,self.attr)
+      # execute member method
+      new.append(f(**kwargs))
+    # return new ensemble
+    return new
+  ...
+        \end{minted}
+      \end{myBox}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \medskip \\
+      { \large Implementation of the \\ \smallskip \textbf{\color{darkred} Ensemble Wrapper}:} \\
+      \small
+      \begin{enumerate}
+        \item Initialize with ensemble members and the called attribute/method \medskip
+        \item Use \texttt{\_\_call\_\_} method to execute member method with arguments
+      \end{enumerate}
+      \onslide<1->{\begin{myGreenBox}{0.9\textwidth}{Parallelization}
+          Simple parallelization using \texttt{multiprocessing.Pool}'s \texttt{apply\_async} can be applied
+        \end{myGreenBox}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+% ################################################################################################
+
+
+\section{\ Argument Expansion}
+
+
+\subsection*{Motivation}
+
+\begin{frame}[fragile=singleslide]{How can we use Ensembles with Argument Lists}
+  \vspace*{-.25cm}
+  \begin{myCode}{\textwidth}{A Trivial Case}
+    \small
+    \begin{minted}{python}
+# this defeats the purpose
+members = [member.operation(arg1=arg) for arg in arg_list]
+Ensemble(*members) # initialize new ensemble
+
+# a better solution: pass list directly
+ensemble.operation(arg1=arg_list, inner_list=['arg1'])
+    \end{minted}
+  \end{myCode}
+  \vspace*{-.25cm}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      Argument lists can easily be implemented in the \texttt{\_\_call\_\_} method of the ensemble wrapper EnsWrap by creating a list of arguments for each member
+    \end{column}
+    \begin{column}{0.6\textwidth}
+      \vspace*{-.25cm}
+      \begin{myCode}{1.\textwidth}{}
+        \small
+        \begin{minted}{python}
+# construct argument list
+args_list = expandArgList(**kwargs)
+# loop over lists
+ens = self._ensemble
+for m,args in zip(ens,args_list):
+  f = getattr(m,self.attr)
+  # execute member method with args
+  new.append(f(**args))
+        \end{minted}
+      \end{myCode}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile=singleslide]{How can we use Ensembles with Argument Lists}
+  \begin{myCode}{\textwidth}{A More Complex Case: the Outer Product List}
+    \small
+    \begin{minted}{python}
+# again, this defeats the purpose
+arg_list = []
+for arg1 in arg_list1: # construct arg_list from two lists
+  for arg2 in arg_list2: # i.e. all possible combinations
+    arg_list.append(dict(arg1=arg1, arg2=arg2))
+# apply list to ensemble
+ensemble.operation(arg1=arg_list, inner_list=['arg1'])
+
+# a better solution is to expand the lists internally
+ensemble.operation(arg1=arg_list1, arg2=arg_list2,
+                        outer_list=['arg1','arg2'])
+    \end{minted}
+  \end{myCode}
+  \smallskip
+  The \textbf{Outer Product} expansion of multiple argument lists creates argument lists with all possible combinations of arguments.
+  \textbf{Inner Product} expansion works like Python's \texttt{zip} function.
+\end{frame}
+
+
+\subsection[Implementation]{Outer Product Implementation}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.03\textwidth}{\color{darkred} Argument Expansion}\\ \hspace*{0.03\textwidth} via Outer Product}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \smallskip \\
+      { \large Recursive Implementation \\ \smallskip of {\usebeamercolor[fg]{frametitle} \textbf{Outer Product}}:} \\
+      \small
+      \begin{enumerate}
+        \item Separate expansion arguments from others
+        \item<2-> Recursively expand argument list %, using \textbf{Outer Product} rules
+        \item<2-> Generate argument set for each ensemble member
+      \end{enumerate}
+      \onslide<3->{\begin{myGreenBox}{0.85\textwidth}{Decorator Class}
+          Argument Expansion is most useful as a Decorator class
+        \end{myGreenBox}}
+%       \textit{Argument expansion is also be useful outside of} Ensemble \textit{class}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.5cm}
+      \begin{myCode}{1.\textwidth}{Implementation of Recursion}
+        \small
+        \begin{minted}{python}
+def expandArgsList(args_list,
+            exp_args, kwargs):
+  # check recursion condition
+  if len(exp_args) > 0:
+    # expand arguments
+    now_arg = exp_args.pop(0)
+    new_list = [] # new arg list
+    for narg in kwargs[now_arg]:
+      for arg_list in args_list:
+        arg_list.append(narg)
+        new_list.append(arg_list)
+    # next recursion level
+    args_list = expandArgsList(
+      new_list, exp_args, kwargs)
+  ...
+  # terminate: return arg lists
+  return args_list
+        \end{minted}
+      \end{myCode}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.03\textwidth}{\color{darkred} Argument Expansion}\\ \hspace*{0.03\textwidth} via Outer Product}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \smallskip \\
+      { \large Recursive Implementation \\ \smallskip of {\usebeamercolor[fg]{frametitle} \textbf{Outer Product}}:} \\
+      \small
+      \begin{enumerate}
+        \item Separate expansion arguments from others
+        \item<1-> Recursively expand argument list %, using \textbf{Outer Product} rules
+        \item<1-> Generate argument set for each ensemble member
+      \end{enumerate}
+      \onslide<2->{\begin{myGreenBox}{0.85\textwidth}{Decorator Class}
+          Argument Expansion is most useful as a Decorator class
+        \end{myGreenBox}}
+%       \textit{Argument expansion is also be useful outside of} Ensemble \textit{class}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.5cm}
+      \begin{myCode}{1.\textwidth}{Implementation of Recursion}
+        \small
+        \begin{minted}{python}
+def expandArgsList(args_list,
+            exp_args, kwargs):
+  # check recursion condition
+  if len(exp_args) > 0:
+    # expand arguments
+    now_arg = exp_args.pop(0)
+    new_list = [] # new arg list
+    for narg in kwargs[now_arg]:
+      for arg_list in args_list:
+        arg_list.append(narg)
+        new_list.append(arg_list)
+    # next recursion level
+    args_list = expandArgsList(
+      new_list, exp_args, kwargs)
+  ...
+  # terminate: return arg lists
+  return args_list
+        \end{minted}
+      \end{myCode}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile=singleslide]{\hspace*{0.03\textwidth}{\color{darkred} Argument Expansion}\\ \hspace*{0.03\textwidth} via Outer Product}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \smallskip \\
+      { \large Recursive Implementation \\ \smallskip of {\usebeamercolor[fg]{frametitle} \textbf{Outer Product}}:} \\
+      \small
+      \begin{enumerate}
+        \item Separate expansion arguments from others
+        \item<1-> Recursively expand argument list %, using \textbf{Outer Product} rules
+        \item<1-> Generate argument set for each ensemble member
+      \end{enumerate}
+      \onslide<1->{\begin{myGreenBox}{0.85\textwidth}{Decorator Class}
+          Argument Expansion is most useful as a Decorator class
+        \end{myGreenBox}}
+%       \textit{Argument expansion is also be useful outside of} Ensemble \textit{class}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \vspace*{-1.5cm}
+      \begin{myCode}{1.\textwidth}{Implementation of Recursion}
+        \small
+        \begin{minted}{python}
+def expandArgsList(args_list,
+            exp_args, kwargs):
+  # check recursion condition
+  if len(exp_args) > 0:
+    # expand arguments
+    now_arg = exp_args.pop(0)
+    new_list = [] # new arg list
+    for narg in kwargs[now_arg]:
+      for arg_list in args_list:
+        arg_list.append(narg)
+        new_list.append(arg_list)
+    # next recursion level
+    args_list = expandArgsList(
+      new_list, exp_args, kwargs)
+  ...
+  # terminate: return arg lists
+  return args_list
+        \end{minted}
+      \end{myCode}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ################################################################################################
+
+
+\section[\ \ \ ]{Summary \& Conclusion}
+
+\begin{frame}{\hspace*{0.35\textwidth}Summary \& Conclusion}
+  \bigskip
+  {\Large \color{teal} \textbf{The Ensemble Class} }\smallskip
+  \begin{itemize}
+    \item Functions like a \textbf{container type} and redirects \\
+    calls to (parallelized) \textbf{member methods}
+  \end{itemize}
+   \medskip
+  {\Large \usebeamercolor[fg]{frametitle} \textbf{Argument Expansion} }\smallskip
+  \begin{itemize}
+    \item Systematic expansion of argument lists from \\
+    \textbf{inner} or \textbf{outer product} (with decorator)
+  \end{itemize}
+  \medskip
+  \begin{myRedBox}{0.9\textwidth}{Sprint Project: Publish Ensemble Class}
+    Create a stand-alone module with the Ensemble class and the argument expansion code for others to use, and add support for array-like item access/assignment
+  \end{myRedBox}
+\end{frame}
+
+\begin{frame}
+  \vspace*{0.2\textheight}
+  \begin{center}
+    \LARGE
+    Thank You!\hspace{1.5cm}  $\sim$ \hspace{1.5cm} Questions?
+  \end{center}
+  \begin{columns}[T]
+   \begin{column}{0.4\textwidth}
+     \vspace*{0.1\textheight}
+   \end{column}
+   \begin{column}{0.4\textwidth}
+     \vspace*{0.25\textheight}
+     \hfill \includegraphics[width=\textwidth]{aquanty-Logo_transparent}
+   \end{column}
+ \end{columns}
+\end{frame}
+
+
+\end{document}
