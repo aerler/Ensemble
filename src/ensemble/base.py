@@ -8,8 +8,8 @@ Variable and Dataset classes for handling geographical datasets.
 
 # external imports
 import multiprocessing
-# numpy imports
 import numpy as np
+
 # internal imports
 from ensemble.expand import expandArgumentList, ArgumentError 
 import collections
