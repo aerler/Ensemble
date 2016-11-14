@@ -17,12 +17,12 @@ from copy import deepcopy
 import shutil
 
 # internal imports
-from ensemble.base import Ensemble
+# from ensemble.base import Ensemble
 from ensemble.expand import expandArgumentList
 
 
 ## tests related to loading datasets
-class DatasetsTest(unittest.TestCase):  
+class ArgumentTest(unittest.TestCase):  
    
   def setUp(self):
     ''' create two test variables '''
@@ -210,7 +210,9 @@ if __name__ == "__main__":
     # list of tests to be performed
     tests = [] 
     # list of Container tests
-    tests += ['Container'] 
+    tests += ['Argument'] 
+    # list of Container tests
+#     tests += ['Container'] 
     # list of Method tests
 #     tests += ['Method']
     

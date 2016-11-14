@@ -6,8 +6,12 @@ Variable and Dataset classes for handling geographical datasets.
 @author: Andre R. Erler, GPL v3
 """
 
+# external imports
+import multiprocessing
 # numpy imports
 import numpy as np
+# internal imports
+from ensemble.expand import expandArgumentList, ArgumentError 
 
 # named exception
 class EnsembleError(Exception):
@@ -184,8 +188,8 @@ class Ensemble(object):
   
   def __setattr__(self, attr, value):
     """Redirect setting of attributes to ensemble members if the ensemble class does not have it."""
-    if attr in self.__dict__ or attr in EnsHGS.__dict__: 
-      super(EnsHGS, self).__setattr__(attr, value)
+    if attr in self.__dict__ or attr in Ensemble.__dict__: 
+      super(Ensemble, self).__setattr__(attr, value)
     else:
       for member in self.members: setattr(member, attr, value)
   
@@ -284,7 +288,7 @@ class Ensemble(object):
   
   def __mul__(self, n):
     """How to combine with other objects."""
-    if isInt(n):
+    if isinstance(n,(int,np.integer)):
       return self.members*n
     else:
       raise TypeError
